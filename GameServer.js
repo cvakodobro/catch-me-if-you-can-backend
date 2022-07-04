@@ -126,10 +126,11 @@ class GameServer {
       (Math.floor(Math.random() * 10) & 1) |
       (Math.floor(Math.random() * 10) & 1);
 
+    //todo: add more surprises
     if (!surpriseOrNot) {
       return {
-        step: 0,
-        message: "hehe oops... you need to take one step back",
+        step: -1,
+        message: "oops... you need to take one step back",
       };
     } else
       return {
