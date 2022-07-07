@@ -57,6 +57,7 @@ class GameServer {
     this.players = [];
     this.curPlayer = 0;
     this.gameRunning = false;
+    this.surprise = null;
   }
 
   joinPlayer(player) {
@@ -116,11 +117,36 @@ class GameServer {
   }
 
   getSurprise() {
-    if (this.currentSetCorrectAnswers === 0)
+    if (this.currentSetCorrectAnswers === 0) {
+      this.surprise = {
+        step: 0,
+        message: "oops... you did not have any correct answer",
+      };
       return {
         step: 0,
         message: "oops... you did not have any correct answer",
       };
+    }
+
+    if (
+      this.players[this.curPlayer].position ===
+      this.players[this.curPlayer].initialPosition
+    ) {
+      return {
+        step: 0,
+        message:
+          "oops you are on the start position again.. no surprise for you",
+      };
+    }
+
+    // this.surprise = {
+    //   step: -1,
+    //   message: "oops... you need to take one step back",
+    // };
+    // return {
+    //   step: -1,
+    //   message: "oops... you need to take one step back",
+    // };
 
     const surpriseOrNot =
       (Math.floor(Math.random() * 10) & 1) |
@@ -128,19 +154,29 @@ class GameServer {
 
     //todo: add more surprises
     if (!surpriseOrNot) {
+      this.surprise = {
+        step: -1,
+        message: "oops... you need to take one step back",
+      };
       return {
         step: -1,
         message: "oops... you need to take one step back",
       };
-    } else
+    } else {
+      this.surprise = {
+        step: 0,
+        message: "more luck next time",
+      };
       return {
         step: 0,
         message: "more luck next time",
       };
+    }
   }
 
   nextPlayer() {
     this.currentSetCorrectAnswers = 0;
+    this.surprise = null;
     let nxtPlayer = this.curPlayer;
 
     this.curPlayer = wrapMod(nxtPlayer + 1, this.players.length);
@@ -159,9 +195,11 @@ class GameServer {
       this.players[this.curPlayer].moved = true;
     }
 
-    for (let i = 0; i < step; i++) {
+    for (let i = 0; i < Math.abs(step); i++) {
       this.players[this.curPlayer].position =
-        (this.players[this.curPlayer].position + 1) % 24;
+        (((this.players[this.curPlayer].position + Math.sign(step)) % 24) +
+          24) %
+        24;
 
       if (
         this.players[this.curPlayer].moved &&

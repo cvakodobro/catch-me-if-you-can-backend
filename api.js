@@ -1,8 +1,4 @@
-const {
-  getServer,
-  setServer,
-  deleteServer,
-} = require("./DB/Servers");
+const { getServer, setServer, deleteServer } = require("./DB/Servers");
 const { addPlayer, removePlayer, getPlayer } = require("./DB/PlayersSockets");
 const { io } = require("./server");
 const { getBots } = require("./DB/Bots");
@@ -175,6 +171,7 @@ function movePlayer(server, step) {
 }
 
 function checkIfEnd(server) {
+  if (server.surprise !== null) return false;
   if (
     server.players[server.curPlayer].moved &&
     server.players[server.curPlayer].position ===
@@ -191,7 +188,12 @@ function checkPlayerToRemove(server) {
   let playerToRemove = undefined;
 
   server.players.forEach((player, index) => {
-    console.log(index, player.removed, player.position, server.players[server.curPlayer].position)
+    console.log(
+      index,
+      player.removed,
+      player.position,
+      server.players[server.curPlayer].position
+    );
     if (index === server.curPlayer || player.removed) return;
 
     if (player.position === server.players[server.curPlayer].position) {
@@ -199,7 +201,7 @@ function checkPlayerToRemove(server) {
     }
   });
 
-  if (playerToRemove!==undefined) {
+  if (playerToRemove !== undefined) {
     const { newPlayers, removedPlayer } = server.removePlayer(playerToRemove);
 
     for (const player of server.players) {
@@ -241,7 +243,7 @@ function emitPlayerSurprise(server) {
 
   setTimeout(
     () => {
-      if (surprise.step) {
+      if (surprise.step !== 0) {
         movePlayer(server, surprise.step);
       } else {
         nextPlayer({ serverId: server.serverId });
@@ -273,8 +275,8 @@ function emitPlayersChanged(
 
 function nextPlayer({ serverId }) {
   console.log("nextPlayer");
-  const server = getServer(serverId);
 
+  const server = getServer(serverId);
   const data = server.nextPlayer();
   console.log(data);
   for (const player of server.players) {
