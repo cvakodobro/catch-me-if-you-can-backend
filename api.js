@@ -137,15 +137,20 @@ function emitQuestion(server) {
 }
 
 function next({ serverId, answerIndex }) {
-  const server = getServer(serverId);
-  answerQuestion(server, answerIndex);
-  setTimeout(() => {
-    if (server.currentQuestion < 3) {
-      emitQuestion(server);
-    } else {
-      movePlayer(server);
-    }
-  }, 2000);
+  console.log("next", answerIndex);
+  try {
+    const server = getServer(serverId);
+    answerQuestion(server, answerIndex);
+    setTimeout(() => {
+      if (server.currentQuestion < 5) {
+        emitQuestion(server);
+      } else {
+        movePlayer(server);
+      }
+    }, 2000);
+  } catch (error) {
+    console.log("server removed");
+  }
 }
 
 function movePlayer(server, step) {
@@ -275,33 +280,41 @@ function emitPlayersChanged(
 
 function nextPlayer({ serverId }) {
   console.log("nextPlayer");
-
-  const server = getServer(serverId);
-  const data = server.nextPlayer();
-  console.log(data);
-  for (const player of server.players) {
-    if (player.socketId) {
-      io.to(player.socketId).emit("next-player", data);
+  try {
+    const server = getServer(serverId);
+    const data = server.nextPlayer();
+    console.log(data);
+    for (const player of server.players) {
+      if (player.socketId) {
+        io.to(player.socketId).emit("next-player", data);
+      }
     }
-  }
 
-  if (
-    server.players[server.curPlayer] &&
-    (server.players[server.curPlayer].disconnected ||
-      server.players[server.curPlayer].isBot)
-  ) {
-    setTimeout(() => {
-      startQuestions(server);
-    }, 3000);
+    if (
+      server.players[server.curPlayer] &&
+      (server.players[server.curPlayer].disconnected ||
+        server.players[server.curPlayer].isBot)
+    ) {
+      setTimeout(() => {
+        startQuestions(server);
+      }, 3000);
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
 function moveBot(server) {
   console.log("bot");
-  next({ serverId: server.serverId, answerIndex: 3 });
+  next({
+    serverId: server.serverId,
+    answerIndex: 3
+    // answerIndex: Math.floor(Math.random() * 4),
+  });
 }
 
 function leaveServer(socket) {
+  console.log("leave-server");
   try {
     const player = getPlayer(socket.id);
     const { playerId, serverId } = player;

@@ -39,7 +39,7 @@ class GameServer {
   async fetchQuiz() {
     try {
       const { data } = await axios.get(
-        `https://opentdb.com/api.php?amount=30&category=9&difficulty=medium&difficulty=easy&type=multiple&encode=url3986`
+        `https://opentdb.com/api.php?amount=50&type=multiple&encode=url3986&token=`+this.token
       );
 
       return data.results.map((element, i) => ({
@@ -86,15 +86,13 @@ class GameServer {
     }
   }
 
-  start() {
+  async start() {
     this.players = this.players.sort(() => Math.random() - 0.5);
-    this.players.forEach((player, idx) => {
+    this.players.forEach(async (player, idx) => {
       player.color = COLOR[idx];
       player.initialPosition = idx * 6;
       player.position = idx * 6;
-      this.fetchQuiz().then((res) => {
-        player.questions = res;
-      });
+      player.questions = await this.fetchQuiz()
     });
   }
 
@@ -104,7 +102,10 @@ class GameServer {
 
   answerQuestion(answerIndex) {
     this.currentQuestion += 1;
-    if (this.question.answers[answerIndex] === this.question.correct_answer)
+    if (
+      this.answerIndex !== null &&
+      this.question.answers[answerIndex] === this.question.correct_answer
+    )
       this.currentSetCorrectAnswers += 1;
   }
 
@@ -206,6 +207,7 @@ class GameServer {
         this.players[this.curPlayer].position ===
           this.players[this.curPlayer].initialPosition
       ) {
+        if (step < 0) this.players[this.curPlayer].moved = false;
         break;
       }
     }

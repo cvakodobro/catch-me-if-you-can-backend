@@ -2,22 +2,22 @@
     "bots": [
         {
             "id": "1",
-            "name": "Mikasa",
+            "name": "Buddy",
             "avatar": "234"
         },
         {
             "id": "3",
-            "name": "Chara",
+            "name": "Rubby",
             "avatar": "123"
         },
         {
             "id": "4",
-            "name": "Buddy",
+            "name": "Teddy",
             "avatar": "321"
         },
         {
             "id": "2",
-            "name": "Hamza",
+            "name": "Muddy",
             "avatar": "333"
         }
     ]
