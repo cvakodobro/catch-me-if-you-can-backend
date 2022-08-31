@@ -9,6 +9,25 @@ const COLOR = {
   3: "yellow",
 };
 
+const surprises = [
+  {
+    step: -1,
+    message: "oops... you need to take one step back",
+  },
+  {
+    step: -2,
+    message: "oops... you need to take two steps back",
+  },
+  {
+    step: 1,
+    message: "yay! you need to take one step forward",
+  },
+  {
+    step: 2,
+    message: "yay! you need to take two steps forward",
+  },
+];
+
 class GameServer {
   serverId;
   serverName;
@@ -39,7 +58,8 @@ class GameServer {
   async fetchQuiz() {
     try {
       const { data } = await axios.get(
-        `https://opentdb.com/api.php?amount=50&type=multiple&encode=url3986&token=`+this.token
+        `https://opentdb.com/api.php?amount=50&type=multiple&encode=url3986&token=` +
+          this.token
       );
 
       return data.results.map((element, i) => ({
@@ -92,7 +112,7 @@ class GameServer {
       player.color = COLOR[idx];
       player.initialPosition = idx * 6;
       player.position = idx * 6;
-      player.questions = await this.fetchQuiz()
+      player.questions = await this.fetchQuiz();
     });
   }
 
@@ -140,29 +160,15 @@ class GameServer {
       };
     }
 
-    // this.surprise = {
-    //   step: -1,
-    //   message: "oops... you need to take one step back",
-    // };
-    // return {
-    //   step: -1,
-    //   message: "oops... you need to take one step back",
-    // };
-
     const surpriseOrNot =
       (Math.floor(Math.random() * 10) & 1) |
       (Math.floor(Math.random() * 10) & 1);
 
-    //todo: add more surprises
     if (!surpriseOrNot) {
-      this.surprise = {
-        step: -1,
-        message: "oops... you need to take one step back",
-      };
-      return {
-        step: -1,
-        message: "oops... you need to take one step back",
-      };
+      let sur = Math.floor(Math.random() * 3);
+
+      this.surprise = surprises[sur];
+      return this.surprise;
     } else {
       this.surprise = {
         step: 0,

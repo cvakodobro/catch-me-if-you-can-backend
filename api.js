@@ -308,8 +308,8 @@ function moveBot(server) {
   console.log("bot");
   next({
     serverId: server.serverId,
-    answerIndex: 3
-    // answerIndex: Math.floor(Math.random() * 4),
+    // answerIndex: 3
+    answerIndex: Math.floor(Math.random() * 4),
   });
 }
 
