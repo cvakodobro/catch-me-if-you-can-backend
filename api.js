@@ -35,22 +35,22 @@ function joinServer({
   io.to(serverId).emit("players-changed", server.players);
 
   // TO BE REMOVED (ONLY FOR DEVELOPMENT)
-  if (server.players.length === 2) {
-    setTimeout(() => {
-      const botsToAdd = getBots(server.numberOfPlayers - server.players.length);
-      for (const bot of botsToAdd) {
-        joinServer({
-          serverId,
-          serverPassword: server.serverPassword,
-          player: {
-            ...bot,
-            isBot: true,
-          },
-        });
-      }
-    }, 1000);
-    return;
-  }
+  // if (server.players.length === 2) {
+  //   setTimeout(() => {
+  //     const botsToAdd = getBots(server.numberOfPlayers - server.players.length);
+  //     for (const bot of botsToAdd) {
+  //       joinServer({
+  //         serverId,
+  //         serverPassword: server.serverPassword,
+  //         player: {
+  //           ...bot,
+  //           isBot: true,
+  //         },
+  //       });
+  //     }
+  //   }, 1000);
+  //   return;
+  // }
 
   if (server.players.length === server.numberOfPlayers) {
     initGame({ socket, server });
